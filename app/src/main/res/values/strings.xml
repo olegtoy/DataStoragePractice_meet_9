@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">DataStoragePractice_meet_9</string>
+    <string name="title">Заголовок</string>
+    <string name="text">Текст заметки</string>
+    <string name="Save">Сохранить</string>
+    <string name="Close">Закрыть</string>
+    <string name="CreateNote">Создать заметку</string>
+    <string name="SaveSetting">Сохранить настройки</string>
+    <string name="TextSize">Размер текста</string>
+    <string name="ColorText">Цвет текста</string>
+    <string name="Setting">Настройки</string>
+    <string name="ChangeNote">Сохранить изменения</string>
+
+
+
 </resources>
