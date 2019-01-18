@@ -17,8 +17,6 @@ import java.util.List;
  */
 
 public class DBManager {
-
-
     private DbHelper dbHelper;
 
     public DBManager(Context context) {
@@ -33,9 +31,6 @@ public class DBManager {
             db.beginTransaction();
             addNoteInternal(db, contentValues);
             db.setTransactionSuccessful();
-
-        } catch (SQLiteConstraintException e) {
-            //   Toast.makeText("Заметка сохранена",Toast.LENGTH_SHORT).show();
 
         } catch (SQLiteException e) {
             Log.v("SQLiteExeption", e.getMessage());
@@ -60,8 +55,27 @@ public class DBManager {
             db.update(DbHelper.NOTES_TABLE, contentValues, String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
             db.setTransactionSuccessful();
 
-        } catch (SQLiteConstraintException e) {
-            //   Toast.makeText("Заметка сохранена",Toast.LENGTH_SHORT).show();
+        }  catch (SQLiteException e) {
+            Log.v("SQLiteExeption", e.getMessage());
+        } finally {
+            if (db != null) {
+                db.endTransaction();
+            }
+            db.close();
+        }
+    }
+
+    public void deleteNote(Note note) {
+        SQLiteDatabase db = null;
+        try {
+            db = dbHelper.getWritableDatabase();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DbHelper.TITLE, note.getTitle());
+            contentValues.put(DbHelper.TEXT_NOTE, note.getText_note());
+
+            db.beginTransaction();
+            db.delete(DbHelper.NOTES_TABLE, String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
+            db.setTransactionSuccessful();
 
         } catch (SQLiteException e) {
             Log.v("SQLiteExeption", e.getMessage());

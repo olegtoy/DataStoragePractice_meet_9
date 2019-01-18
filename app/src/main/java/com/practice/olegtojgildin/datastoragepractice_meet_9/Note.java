@@ -8,12 +8,14 @@ public class Note {
     private String title;
     private int id;
     private String text_note;
-    public Note(){
+
+    public Note() {
 
     }
-    public Note(String title,String text_note){
-        this.title=title;
-        this.text_note=text_note;
+
+    public Note(String title, String text_note) {
+        this.title = title;
+        this.text_note = text_note;
     }
 
     public String getTitle() {

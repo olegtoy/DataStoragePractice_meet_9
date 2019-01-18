@@ -40,9 +40,9 @@ public class CreateNoteActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (titleNote.getText() != null && textNote.getText() != null) {
 
-                    Note newNote=new Note(titleNote.getText().toString(), textNote.getText().toString());
+                    Note newNote = new Note(titleNote.getText().toString(), textNote.getText().toString());
                     try {
-                        new AsyncTask<Note,Void,Void>(){
+                        new AsyncTask<Note, Void, Void>() {
                             @Override
                             protected Void doInBackground(Note... notes) {
                                 DBManager dbManager = new DBManager(CreateNoteActivity.this);
@@ -50,9 +50,8 @@ public class CreateNoteActivity extends AppCompatActivity {
                                 return null;
                             }
                         }.execute(newNote);
-
+                        setResult(RESULT_OK);
                         Toast.makeText(CreateNoteActivity.this, "Заметка сохранена", Toast.LENGTH_SHORT).show();
-
                     } catch (android.database.sqlite.SQLiteConstraintException e) {
                         Toast.makeText(CreateNoteActivity.this, "Заметка с таким заголовком уже существует", Toast.LENGTH_SHORT).show();
                     }
@@ -73,6 +72,7 @@ public class CreateNoteActivity extends AppCompatActivity {
         saveNote = findViewById(R.id.saveNote);
         closeNote = findViewById(R.id.close_note);
     }
+
 
     public static final Intent newIntent(Context context) {
         Intent intent = new Intent(context, CreateNoteActivity.class);

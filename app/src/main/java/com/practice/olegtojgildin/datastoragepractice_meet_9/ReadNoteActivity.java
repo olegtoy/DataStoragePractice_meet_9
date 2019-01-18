@@ -37,12 +37,11 @@ public class ReadNoteActivity extends AppCompatActivity {
 
     private void initSetting() {
         SettingDataStore settingNote = new SettingDataStore(ReadNoteActivity.this);
-        try{
+        try {
             textNote.setTextSize(settingNote.getTextSize());
             textNote.setTextColor(Color.parseColor(settingNote.getTextColor()));
-        }
-        catch (RuntimeException ex){
-            Toast.makeText(this,"Неверные настройки текста",Toast.LENGTH_SHORT).show();
+        } catch (RuntimeException ex) {
+            Toast.makeText(this, "Неверные настройки текста", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -53,10 +52,9 @@ public class ReadNoteActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (titleNote.getText() != null && textNote.getText() != null)
-                {
-                    Note tempNote=new Note(titleNote.getText().toString(), textNote.getText().toString());
-                    new AsyncTask<Note,Void,Void>(){
+                if (titleNote.getText() != null && textNote.getText() != null) {
+                    Note tempNote = new Note(titleNote.getText().toString(), textNote.getText().toString());
+                    new AsyncTask<Note, Void, Void>() {
                         @Override
                         protected Void doInBackground(Note... notes) {
                             DBManager dbManager = new DBManager(ReadNoteActivity.this);

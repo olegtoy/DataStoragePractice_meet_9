@@ -14,11 +14,12 @@ import android.widget.Toast;
  * Created by olegtojgildin on 17/01/2019.
  */
 
-public class SettingActivity extends AppCompatActivity{
+public class SettingActivity extends AppCompatActivity {
 
     EditText textSize;
     Button saveSet;
     EditText textColor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,16 +30,15 @@ public class SettingActivity extends AppCompatActivity{
 
     public void initview() {
         textSize = findViewById(R.id.TextSize);
-        saveSet =findViewById(R.id.SaveSettingBtn);
-        textColor=findViewById(R.id.TextColor);
-        Log.d("setting",saveSet.toString());
+        saveSet = findViewById(R.id.SaveSettingBtn);
+        textColor = findViewById(R.id.TextColor);
     }
 
     public void initListener() {
         saveSet.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SettingDataStore settingNote=new SettingDataStore(getApplicationContext());
+                SettingDataStore settingNote = new SettingDataStore(getApplicationContext());
                 settingNote.setTextSize(Float.parseFloat(textSize.getText().toString()));
                 settingNote.setTextColor(textColor.getText().toString());
                 Toast.makeText(SettingActivity.this, "Настроки сохранены", Toast.LENGTH_SHORT).show();
