@@ -1,4 +1,4 @@
-package com.practice.olegtojgildin.datastoragepractice_meet_9;
+package com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,7 +43,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
     public void createEmptyTables(SQLiteDatabase database){
-        database.execSQL( "CREATE TABLE NOTES(id integer primary key AUTOINCREMENT, title text not null unique, text_note text)" );
+        database.execSQL( "CREATE TABLE NOTES(id integer primary key AUTOINCREMENT, title text not null, text_note text)" );
     }
     private void deleteTables(SQLiteDatabase database){
         database.execSQL( "DROP TABLE IF EXISTS NOTES" );

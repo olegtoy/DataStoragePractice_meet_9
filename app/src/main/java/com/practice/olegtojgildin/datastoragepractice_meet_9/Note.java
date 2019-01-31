@@ -10,7 +10,6 @@ public class Note {
     private String text_note;
 
     public Note() {
-
     }
 
     public Note(String title, String text_note) {

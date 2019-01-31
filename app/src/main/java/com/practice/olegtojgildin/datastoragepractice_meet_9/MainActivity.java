@@ -13,56 +13,53 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import java.util.ArrayList;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.DBManager;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.DbHelper;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.RecyclerViewNotes.ItemOffsetDecoration;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.RecyclerViewNotes.MyItemTouchHelper;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.RecyclerViewNotes.NotesAdapter;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNoteListener {
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private LinearLayoutManager mManager;
-    Button createNote;
-    Button setSetting;
-    List<Note> mNote;
-    private MyItemTouchHelper myItemTouchHelper;
-    private ItemTouchHelper itemTouchHelper;
     public static final int REQUEST_CODE = 1;
 
+    private RecyclerView mRecyclerView;
+    private NotesAdapter mAdapter;
+    private LinearLayoutManager mManager;
+    private Button mCreateNote;
+    private Button mSetSetting;
+    private List<Note> mNote;
+
+    private MyItemTouchHelper mMyItemTouchHelper;
+    private ItemTouchHelper mItemTouchHelper;
+
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initview();
         initListener();
-        mManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mRecyclerView.setLayoutManager(mManager);
-
-        DBManager dbManager = new DBManager(MainActivity.this);
-        mNote = dbManager.getAllNotes();
-        mAdapter = new NotesAdapter(mNote, this, MainActivity.this);
-        mRecyclerView.setAdapter(mAdapter);
-        myItemTouchHelper = new MyItemTouchHelper((MyItemTouchHelper.ItemTouchHelperAdapter) mAdapter);
-        itemTouchHelper = new ItemTouchHelper(myItemTouchHelper);
-        itemTouchHelper.attachToRecyclerView(mRecyclerView);
-        mRecyclerView.addItemDecoration(new ItemOffsetDecoration(20));
-
+        initRecycler();
+        new AsyckTaskAllNotes().execute();
     }
-
 
     public void initview() {
         mRecyclerView = findViewById(R.id.recycler_view);
-        createNote = findViewById(R.id.createNote);
-        setSetting = findViewById(R.id.setSetting);
+        mCreateNote = findViewById(R.id.createNote);
+        mSetSetting = findViewById(R.id.setSetting);
     }
 
     public void initListener() {
-        createNote.setOnClickListener(new View.OnClickListener() {
+        mCreateNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivityForResult(CreateNoteActivity.newIntent(MainActivity.this), REQUEST_CODE);
             }
         });
-        setSetting.setOnClickListener(new View.OnClickListener() {
+        mSetSetting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(SettingActivity.newIntent(MainActivity.this));
@@ -70,18 +67,56 @@ public class MainActivity extends AppCompatActivity implements NotesAdapter.OnNo
         });
     }
 
+    public void initRecycler() {
+        mManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mRecyclerView.setLayoutManager(mManager);
+    }
+
+    @SuppressLint("StaticFieldLeak")
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        mNote = new DBManager(MainActivity.this).getAllNotes();
-        mAdapter = new NotesAdapter(mNote, this, MainActivity.this);
-        mRecyclerView.setAdapter(mAdapter);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                DBManager dbManager = new DBManager(MainActivity.this);
+                mNote.clear();
+                mNote = dbManager.getAllNotes();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                mAdapter.onNewNote(mNote);
+            }
+        }.execute();
+
 
     }
 
     @Override
     public void onNoteClick(int position) {
-        Intent intent = new Intent(this, ReadNoteActivity.class);
+        Intent intent = ReadNoteActivity.newIntent(this);
         intent.putExtra(DbHelper.TITLE, mNote.get(position).getTitle());
         startActivity(intent);
+    }
+
+    private class AsyckTaskAllNotes extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            DBManager dbManager = new DBManager(MainActivity.this);
+            mNote = dbManager.getAllNotes();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mAdapter = new NotesAdapter(mNote, MainActivity.this, MainActivity.this);
+            mRecyclerView.setAdapter(mAdapter);
+            mMyItemTouchHelper = new MyItemTouchHelper((MyItemTouchHelper.ItemTouchHelperAdapter) mAdapter);
+            mItemTouchHelper = new ItemTouchHelper(mMyItemTouchHelper);
+            mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+            mRecyclerView.addItemDecoration(new ItemOffsetDecoration(20));
+        }
     }
 }

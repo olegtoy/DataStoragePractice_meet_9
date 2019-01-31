@@ -1,4 +1,4 @@
-package com.practice.olegtojgildin.datastoragepractice_meet_9;
+package com.practice.olegtojgildin.datastoragepractice_meet_9.RecyclerViewNotes;
 
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;

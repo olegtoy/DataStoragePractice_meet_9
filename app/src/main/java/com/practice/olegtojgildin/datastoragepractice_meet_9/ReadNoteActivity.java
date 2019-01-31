@@ -14,15 +14,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.DBManager;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.DbHelper;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.SettingDataStore;
+
 /**
  * Created by olegtojgildin on 15/01/2019.
  */
 
 public class ReadNoteActivity extends AppCompatActivity {
 
-    TextView titleNote;
-    EditText textNote;
-    Button changeNote;
+    private TextView mTitleNote;
+    private EditText mTextNote;
+    private Button mChangeNote;
 
 
     @Override
@@ -38,54 +42,53 @@ public class ReadNoteActivity extends AppCompatActivity {
     private void initSetting() {
         SettingDataStore settingNote = new SettingDataStore(ReadNoteActivity.this);
         try {
-            textNote.setTextSize(settingNote.getTextSize());
-            textNote.setTextColor(Color.parseColor(settingNote.getTextColor()));
+            mTextNote.setTextSize(settingNote.getTextSize());
+            mTextNote.setTextColor(Color.parseColor(settingNote.getTextColor()));
         } catch (RuntimeException ex) {
             Toast.makeText(this, "Неверные настройки текста", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     public void initListener() {
-        changeNote.setOnClickListener(new View.OnClickListener() {
+        mChangeNote.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("StaticFieldLeak")
             @Override
             public void onClick(View view) {
-
-                if (titleNote.getText() != null && textNote.getText() != null) {
-                    Note tempNote = new Note(titleNote.getText().toString(), textNote.getText().toString());
-                    new AsyncTask<Note, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Note... notes) {
-                            DBManager dbManager = new DBManager(ReadNoteActivity.this);
-                            dbManager.updateNote(notes[0]);
-
-                            return null;
-                        }
-                    }.execute(tempNote);
+                if (mTitleNote.getText() != null && mTextNote.getText() != null) {
+                    Note tempNote = new Note(mTitleNote.getText().toString(), mTextNote.getText().toString());
+                    new AsyckTaskUpdate().execute(tempNote);
                 }
             }
         });
     }
 
     public void initViews() {
-        textNote = findViewById(R.id.readText);
-        titleNote = findViewById(R.id.readTitle);
-        changeNote = findViewById(R.id.changeNote);
+        mTextNote = findViewById(R.id.readText);
+        mTitleNote = findViewById(R.id.readTitle);
+        mChangeNote = findViewById(R.id.changeNote);
     }
 
     public void initNote() {
         DBManager dbManager = new DBManager(ReadNoteActivity.this);
         Note newNote = dbManager.getNote(getIntent().getStringExtra(DbHelper.TITLE));
         if (newNote.getTitle() != null && newNote.getText_note() != null) {
-            titleNote.setText(newNote.getTitle());
-            textNote.setText(newNote.getText_note());
+            mTitleNote.setText(newNote.getTitle());
+            mTextNote.setText(newNote.getText_note());
         }
     }
 
     public static final Intent newIntent(Context context) {
         Intent intent = new Intent(context, ReadNoteActivity.class);
         return intent;
+    }
+
+    private class AsyckTaskUpdate extends AsyncTask<Note, Void, Void> {
+        @Override
+        protected java.lang.Void doInBackground(com.practice.olegtojgildin.datastoragepractice_meet_9.Note... notes) {
+            DBManager dbManager = new DBManager(ReadNoteActivity.this);
+            dbManager.updateNote(notes[0]);
+            return null;
+        }
     }
 }
 

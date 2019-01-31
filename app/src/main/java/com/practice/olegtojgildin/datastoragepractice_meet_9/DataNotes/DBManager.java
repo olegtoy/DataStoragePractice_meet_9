@@ -1,13 +1,14 @@
-package com.practice.olegtojgildin.datastoragepractice_meet_9;
+package com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
-import android.widget.Toast;
+
+import com.practice.olegtojgildin.datastoragepractice_meet_9.DataNotes.DbHelper;
+import com.practice.olegtojgildin.datastoragepractice_meet_9.Note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,11 +28,10 @@ public class DBManager {
         SQLiteDatabase db = null;
         try {
             db = dbHelper.getWritableDatabase();
-            ContentValues contentValues = getContentValues(note);
             db.beginTransaction();
-            addNoteInternal(db, contentValues);
+            if(db.inTransaction())
+                 addNoteInternal(db, getContentValues(note));
             db.setTransactionSuccessful();
-
         } catch (SQLiteException e) {
             Log.v("SQLiteExeption", e.getMessage());
         } finally {
@@ -46,13 +46,9 @@ public class DBManager {
         SQLiteDatabase db = null;
         try {
             db = dbHelper.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(DbHelper.TITLE, note.getTitle());
-            contentValues.put(DbHelper.TEXT_NOTE, note.getText_note());
-
             db.beginTransaction();
-
-            db.update(DbHelper.NOTES_TABLE, contentValues, String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
+            if(db.inTransaction())
+                db.update(DbHelper.NOTES_TABLE, getContentValues(note), String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
             db.setTransactionSuccessful();
 
         }  catch (SQLiteException e) {
@@ -69,12 +65,9 @@ public class DBManager {
         SQLiteDatabase db = null;
         try {
             db = dbHelper.getWritableDatabase();
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(DbHelper.TITLE, note.getTitle());
-            contentValues.put(DbHelper.TEXT_NOTE, note.getText_note());
-
             db.beginTransaction();
-            db.delete(DbHelper.NOTES_TABLE, String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
+            if(db.inTransaction())
+                db.delete(DbHelper.NOTES_TABLE, String.format("%1$s= '%2$s'", DbHelper.TITLE, note.getTitle()), null);
             db.setTransactionSuccessful();
 
         } catch (SQLiteException e) {
@@ -95,8 +88,7 @@ public class DBManager {
             db.beginTransaction();
             String selectQuery = "SELECT  * FROM " + DbHelper.NOTES_TABLE;
             Cursor cursor = db.rawQuery(selectQuery, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()&&db.inTransaction()) {
                 do {
                     mNoteList.add(new Note(cursor.getString(1), cursor.getString(2)));
                 } while (cursor.moveToNext());
@@ -123,9 +115,8 @@ public class DBManager {
             String selectQuery = String.format("SELECT * FROM %1$s where %2$s = '%3$s' ", DbHelper.NOTES_TABLE, DbHelper.TITLE, title);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
-            if (cursor != null && cursor.moveToFirst()) {
+            if (cursor != null && cursor.moveToFirst()&&db.inTransaction()) {
                 do {
-                    Log.d("getNote_cursor", cursor.getString(1));
                     note = new Note(cursor.getString(1), cursor.getString(2));
                 } while (cursor.moveToNext());
             }
